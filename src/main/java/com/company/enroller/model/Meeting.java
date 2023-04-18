@@ -74,4 +74,14 @@ public class Meeting {
         return participants;
     }
 
+    public boolean participantEnrolledMeeting(Participant participant){
+        for (Participant p: this.getParticipants()
+             ) {
+            if(p.getLogin().equals(participant.getLogin())){
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

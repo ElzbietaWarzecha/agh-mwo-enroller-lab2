@@ -3,6 +3,7 @@ package com.company.enroller.controllers;
 import com.company.enroller.model.Meeting;
 import com.company.enroller.model.Participant;
 import com.company.enroller.persistence.MeetingService;
+import com.company.enroller.persistence.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,9 @@ public class MeetingRestController {
 
     @Autowired
     MeetingService meetingService;
+
+    @Autowired
+    ParticipantService participantService;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public ResponseEntity<?> getMeetings() {
@@ -71,5 +75,38 @@ public class MeetingRestController {
         }
         meetingService.update(meeting);
         return new ResponseEntity<Participant>(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}/participants", method = RequestMethod.GET)
+    public ResponseEntity<?> getMeetingParticipants(@PathVariable("id") long id) {
+        Meeting meeting = meetingService.findById(id);
+        if (meeting == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        Collection<Participant> participant = meeting.getParticipants();
+        return new ResponseEntity<Collection<Participant>>(participant, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
+    public ResponseEntity<?> addParticipantToMeeting(@PathVariable("id") long id, @RequestBody Participant participant) {
+        Meeting meeting = meetingService.findById(id);
+        if (meeting == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        if (participantService.findByLogin(participant.getLogin()) != null && !meeting.participantEnrolledMeeting(participant)) {
+            meetingService.addParticipantToMeeting(meeting, participant);
+        }
+        return new ResponseEntity<Participant>(participant, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{meetingId}/{participantId}", method = RequestMethod.DELETE)
+    public ResponseEntity<?> removeParticipantFromMeeting(@PathVariable("meetingId") long meetingId, @PathVariable("participantId") String participantId) {
+        Meeting meeting = meetingService.findById(meetingId);
+        Participant participant = participantService.findByLogin(participantId);
+        if (meeting == null || participant == null) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+        meetingService.removeParticipantFromMeeting(meeting, participant);
+        return new ResponseEntity<Participant>(participant, HttpStatus.OK);
     }
 }
