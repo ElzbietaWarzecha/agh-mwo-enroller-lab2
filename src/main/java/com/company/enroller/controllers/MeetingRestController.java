@@ -90,12 +90,16 @@ public class MeetingRestController {
     @RequestMapping(value = "/{id}", method = RequestMethod.POST)
     public ResponseEntity<?> addParticipantToMeeting(@PathVariable("id") long id, @RequestBody Participant participant) {
         Meeting meeting = meetingService.findById(id);
-        if (meeting == null) {
+        if (meeting == null || participantService.findByLogin(participant.getLogin()) == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        if (participantService.findByLogin(participant.getLogin()) != null && !meeting.participantEnrolledMeeting(participant)) {
-            meetingService.addParticipantToMeeting(meeting, participant);
+        if (meeting.participantEnrolledMeeting(participant)) {
+            return new ResponseEntity<String>(
+                    "A participant with login " + participant.getLogin() + " already enrolled to meeting '" + meeting.getTitle() + "'.",
+                    HttpStatus.CONFLICT);
         }
+        meetingService.addParticipantToMeeting(meeting, participant);
+
         return new ResponseEntity<Participant>(participant, HttpStatus.OK);
     }
 
