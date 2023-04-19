@@ -110,6 +110,11 @@ public class MeetingRestController {
         if (meeting == null || participant == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
+        if(!meeting.participantEnrolledMeeting(participant)) {
+            return new ResponseEntity<String>(
+                    "A participant with login " + participant.getLogin() + " is not enrolled to meeting '" + meeting.getTitle() + "'.",
+                    HttpStatus.NOT_FOUND);
+        }
         meetingService.removeParticipantFromMeeting(meeting, participant);
         return new ResponseEntity<Participant>(participant, HttpStatus.OK);
     }
