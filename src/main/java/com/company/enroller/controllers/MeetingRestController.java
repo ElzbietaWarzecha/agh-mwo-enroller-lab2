@@ -98,7 +98,8 @@ public class MeetingRestController {
                     "A participant with login " + participant.getLogin() + " already enrolled to meeting '" + meeting.getTitle() + "'.",
                     HttpStatus.CONFLICT);
         }
-        meetingService.addParticipantToMeeting(meeting, participant);
+        meeting.addParticipant(participant);
+        meetingService.update(meeting);
 
         return new ResponseEntity<Participant>(participant, HttpStatus.OK);
     }
@@ -115,7 +116,8 @@ public class MeetingRestController {
                     "A participant with login " + participant.getLogin() + " is not enrolled to meeting '" + meeting.getTitle() + "'.",
                     HttpStatus.NOT_FOUND);
         }
-        meetingService.removeParticipantFromMeeting(meeting, participant);
+        meeting.removeParticipant(participant);
+        meetingService.update(meeting);
         return new ResponseEntity<Participant>(participant, HttpStatus.OK);
     }
 }
