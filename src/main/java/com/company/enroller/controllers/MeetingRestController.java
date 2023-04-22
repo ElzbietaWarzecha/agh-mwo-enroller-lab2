@@ -49,7 +49,7 @@ public class MeetingRestController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> delete(@PathVariable("id") long id) {
+    public ResponseEntity<?> deleteMeeting(@PathVariable("id") long id) {
         Meeting meeting = meetingService.findById(id);
         if (meeting == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -59,7 +59,7 @@ public class MeetingRestController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<?> update(@PathVariable("id") long id, @RequestBody Meeting updatedMeeting) {
+    public ResponseEntity<?> updateMeeting(@PathVariable("id") long id, @RequestBody Meeting updatedMeeting) {
         Meeting meeting = meetingService.findById(id);
         if (meeting == null) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -87,7 +87,7 @@ public class MeetingRestController {
         return new ResponseEntity<Collection<Participant>>(participant, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{id}/participants", method = RequestMethod.POST)
     public ResponseEntity<?> addParticipantToMeeting(@PathVariable("id") long id, @RequestBody Participant participant) {
         Meeting meeting = meetingService.findById(id);
         if (meeting == null || participantService.findByLogin(participant.getLogin()) == null) {
@@ -104,7 +104,7 @@ public class MeetingRestController {
         return new ResponseEntity<Participant>(participant, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{meetingId}/{participantId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{meetingId}/participants/{participantId}", method = RequestMethod.DELETE)
     public ResponseEntity<?> removeParticipantFromMeeting(@PathVariable("meetingId") long meetingId, @PathVariable("participantId") String participantId) {
         Meeting meeting = meetingService.findById(meetingId);
         Participant participant = participantService.findByLogin(participantId);
